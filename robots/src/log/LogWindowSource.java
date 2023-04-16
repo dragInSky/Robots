@@ -46,7 +46,7 @@ public class LogWindowSource {
         count++;
         if (m_messages.size() <= m_iQueueLength) {
             m_messages.add(entry);
-        } else {
+        } else if (m_iQueueLength >= 2) {
             m_messages.remove(1);
             m_messages.add(entry);
         }
