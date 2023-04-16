@@ -15,21 +15,20 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final Dimension screenSize;
+    private final int inset = 50;
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
-        int inset = 50;
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
 
         addWindow(createLogWindow());
 
-        GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400, 400);
-        addWindow(gameWindow);
+        addWindow(new GameWindow() { { setSize(400, 400); } } );
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -37,8 +36,11 @@ public class MainApplicationFrame extends JFrame {
 
     protected LogWindow createLogWindow() {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10, 10);
-        logWindow.setSize(300, 800);
+
+        int width = 300;
+        logWindow.setLocation(screenSize.width - width - 10 + inset * 2, 0);
+
+        logWindow.setSize(width, screenSize.height);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
         Logger.debug("Протокол работает");
@@ -140,7 +142,7 @@ public class MainApplicationFrame extends JFrame {
                 new ActionListener[]{event -> Logger.debug("Новая строка")}
         );
 
-        JMenu exitMenu = generateMenu(KeyEvent.VK_Z,"Выход", "Закрытие приложения");
+        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
         generateMenuItems(exitMenu,
                 new int[]{KeyEvent.VK_Z},
                 new String[]{"Закрытие приложения"},

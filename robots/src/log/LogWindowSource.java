@@ -13,9 +13,10 @@ import java.util.Collections;
  * ограниченного размера)
  */
 public class LogWindowSource {
-    private int m_iQueueLength;
+    private final int m_iQueueLength;
+    private int count = 0;
 
-    private ArrayList<LogEntry> m_messages;
+    private final ArrayList<LogEntry> m_messages;
     private final ArrayList<LogChangeListener> m_listeners;
     private volatile LogChangeListener[] m_activeListeners;
 
@@ -40,8 +41,15 @@ public class LogWindowSource {
     }
 
     public void append(LogLevel logLevel, String strMessage) {
-        LogEntry entry = new LogEntry(logLevel, strMessage);
-        m_messages.add(entry);
+        LogEntry entry = new LogEntry(logLevel, "(" + count + ") " + strMessage);
+        count++;
+        if (m_messages.size() <= m_iQueueLength) {
+            m_messages.add(entry);
+        } else {
+            m_messages.remove(1);
+            m_messages.add(entry);
+        }
+
         LogChangeListener[] activeListeners = m_activeListeners;
         if (activeListeners == null) {
             synchronized (m_listeners) {
@@ -50,9 +58,12 @@ public class LogWindowSource {
                     m_activeListeners = activeListeners;
                 }
             }
-        }
-        for (LogChangeListener listener : activeListeners) {
-            listener.onLogChanged();
+        } else for (LogChangeListener listener : activeListeners) {
+            if (m_listeners.contains(listener)) {
+                listener.onLogChanged();
+            } else {
+                unregisterListener(listener);
+            }
         }
     }
 
