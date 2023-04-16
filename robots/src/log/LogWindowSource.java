@@ -1,6 +1,7 @@
 package log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 /**
@@ -59,9 +60,11 @@ public class LogWindowSource {
                 }
             }
         } else for (LogChangeListener listener : activeListeners) {
-            if (m_listeners.contains(listener)) {
-                listener.onLogChanged();
-            } else {
+            listener.onLogChanged();
+        }
+
+        for (LogChangeListener listener : m_listeners) {
+            if (activeListeners != null && !Arrays.asList(activeListeners).contains(listener)) {
                 unregisterListener(listener);
             }
         }
