@@ -15,26 +15,29 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final Dimension screenSize;
-    private final int inset = 50;
 
-    public MainApplicationFrame() {
+    public MainApplicationFrame(/*Adapter*/) {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
-        screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int inset = 50;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset, screenSize.width - inset * 2, screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
 
-        addWindow(createLogWindow());
+        addWindow(createLogWindow(inset, screenSize));
 
-        addWindow(new GameWindow() { { setSize(400, 400); } } );
+        addWindow(new GameWindow() {
+            {
+                setSize(400, 400);
+            }
+        });
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    protected LogWindow createLogWindow() {
+    protected LogWindow createLogWindow(int inset, Dimension screenSize) {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
 
         int width = 300;
@@ -43,6 +46,7 @@ public class MainApplicationFrame extends JFrame {
         logWindow.setSize(width, screenSize.height);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
+        //Logger.debug(adapter.Translate("Протокол работает");
         Logger.debug("Протокол работает");
         return logWindow;
     }
@@ -105,53 +109,54 @@ public class MainApplicationFrame extends JFrame {
         return jMenu;
     }
 
-    private void generateMenuItems(JMenu jMenu,
-                                   int[] externalKeyEvents,
-                                   String[] texts,
-                                   ActionListener[] actionListener) {
-        for (int i = 0; i < externalKeyEvents.length; i++) {
-            JMenuItem jMenuItem = new JMenuItem(texts[i], externalKeyEvents[i]);
-            jMenuItem.addActionListener(actionListener[i]);
-            jMenu.add(jMenuItem);
-        }
+    //Либо передавать структуру, либо создавать по одной менюшке
+    private void generateMenuItems(
+            JMenu jMenu, int externalKeyEvents, String texts, ActionListener actionListener) {
+        JMenuItem jMenuItem = new JMenuItem(texts, externalKeyEvents);
+        jMenuItem.addActionListener(actionListener);
+        jMenu.add(jMenuItem);
+    }
+
+    private JMenu lookAndFeelMenu() {
+        JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_V,
+                "Режим отображения", "Управление режимом отображения приложения"
+        );
+        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_S, "Системная схема",
+                event -> {
+                    setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    this.invalidate();
+                }
+        );
+        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Универсальная схема",
+                event -> {
+                    setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                    this.invalidate();
+                }
+        );
+        return lookAndFeelMenu;
+    }
+
+    private JMenu testMenu() {
+        JMenu testMenu = generateMenu(KeyEvent.VK_T, "Тесты", "Тестовые команды");
+        generateMenuItems(testMenu, KeyEvent.VK_T, "Сообщение в лог",
+                event -> Logger.debug("Новая строка")
+        );
+        return testMenu;
+    }
+
+    private JMenu exitMenu() {
+        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
+        generateMenuItems(exitMenu, KeyEvent.VK_Z, "Закрытие приложения", this::programExit);
+        return exitMenu;
     }
 
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu lookAndFeelMenu = generateMenu(
-                KeyEvent.VK_V, "Режим отображения", "Управление режимом отображения приложения");
-        generateMenuItems(lookAndFeelMenu,
-                new int[]{KeyEvent.VK_S, KeyEvent.VK_U},
-                new String[]{"Системная схема", "Универсальная схема"},
-                new ActionListener[]{
-                        event -> {
-                            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                            this.invalidate();
-                        },
-                        event -> {
-                            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                            this.invalidate();
-                        }}
-        );
+        menuBar.add(lookAndFeelMenu());
+        menuBar.add(testMenu());
+        menuBar.add(exitMenu());
 
-        JMenu testMenu = generateMenu(KeyEvent.VK_T, "Тесты", "Тестовые команды");
-        generateMenuItems(testMenu,
-                new int[]{KeyEvent.VK_T},
-                new String[]{"Сообщение в лог"},
-                new ActionListener[]{event -> Logger.debug("Новая строка")}
-        );
-
-        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
-        generateMenuItems(exitMenu,
-                new int[]{KeyEvent.VK_Z},
-                new String[]{"Закрытие приложения"},
-                new ActionListener[]{this::programExit}
-        );
-
-        menuBar.add(lookAndFeelMenu);
-        menuBar.add(testMenu);
-        menuBar.add(exitMenu);
         return menuBar;
     }
 
