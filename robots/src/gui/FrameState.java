@@ -2,6 +2,7 @@ package gui;
 
 import java.io.*;
 
+
 public class FrameState implements Serializable {
     public int height, width, xPos, yPos;
     public boolean isClosed, isIcon, isMaximum, isSelected;

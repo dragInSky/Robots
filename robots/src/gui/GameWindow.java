@@ -28,6 +28,7 @@ public class GameWindow extends JInternalFrame implements SerializableFrame {
 
     @Override
     public FrameState getFrameState() {
+        System.out.println(this.isClosed);
         return new FrameState(this.getHeight(), this.getWidth(), this.getX(), this.getY(),
                 this.isClosed, this.isIcon, this.isMaximum, this.isSelected);
     }

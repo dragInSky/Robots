@@ -36,10 +36,10 @@ public class MainApplicationFrame extends JFrame {
         logWindow = createLogWindow(inset, screenSize);
         gameWindow = createGameWindow(400, 400);
 
-        loadWindows();
-
         addWindow(logWindow);
         addWindow(gameWindow);
+
+        loadWindows();
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
