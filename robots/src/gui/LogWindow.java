@@ -3,6 +3,7 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.TextArea;
+import java.beans.PropertyVetoException;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -60,11 +61,15 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Seri
 
     @Override
     public void setState(FrameState frameState) {
-        this.setSize(frameState.width, frameState.height);
-        this.setLocation(frameState.xPos, frameState.yPos);
-        this.isClosed = frameState.isClosed;
-        this.isIcon = frameState.isIcon;
-        this.isMaximum = frameState.isMaximum;
-        this.isSelected = frameState.isSelected;
+        try {
+            this.setSize(frameState.width, frameState.height);
+            this.setLocation(frameState.xPos, frameState.yPos);
+            this.setClosed(frameState.isClosed);
+            this.setIcon(frameState.isIcon);
+            this.setMaximum(frameState.isMaximum);
+            this.setSelected(frameState.isSelected);
+        } catch (PropertyVetoException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

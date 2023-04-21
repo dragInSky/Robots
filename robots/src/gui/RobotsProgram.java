@@ -19,7 +19,8 @@ public class RobotsProgram {
         SwingUtilities.invokeLater(() -> {
             MainApplicationFrame frame = new MainApplicationFrame(
                     GameWindow.getInstance(),
-                    LogWindow.getInstance()
+                    LogWindow.getInstance(),
+                    new ProgramState(UIManager.getLookAndFeel().getName())
             );
             frame.pack();
             frame.setVisible(true);
