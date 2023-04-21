@@ -11,9 +11,15 @@ import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener {
+public class LogWindow extends JInternalFrame implements LogChangeListener, SerializableFrame {
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
+
+    private LogWindow() {
+        m_logSource = null;
+        m_logContent = null;
+
+    }
 
     public LogWindow(LogWindowSource logSource) {
         super("Протокол работы", true, true, true, true);
@@ -27,6 +33,10 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
         getContentPane().add(panel);
         pack();
         updateLogContent();
+    }
+
+    public static LogWindow getLogWindowInstance() {
+        return new LogWindow();
     }
 
     private void updateLogContent() {

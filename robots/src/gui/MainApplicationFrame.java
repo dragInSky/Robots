@@ -15,8 +15,13 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final GameWindow gameWindow;
+    private final LogWindow logWindow;
 
-    public MainApplicationFrame(/*Adapter*/) {
+    public MainApplicationFrame(GameWindow gameWindow, LogWindow logWindow/*, Adapter adapter*/) {
+        this.gameWindow = gameWindow;
+        this.logWindow = logWindow;
+
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
         int inset = 50;
@@ -25,13 +30,17 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        addWindow(createLogWindow(inset, screenSize));
+        boolean successLogWindowLoad = logWindow.load(null, "");
+        if (!successLogWindowLoad) {
+            logWindow = createLogWindow(inset, screenSize);
+        }
+        addWindow(logWindow);
 
-        addWindow(new GameWindow() {
-            {
-                setSize(400, 400);
-            }
-        });
+        boolean successGameWindowLoad = gameWindow.load(null, "");
+        if (!successGameWindowLoad) {
+            gameWindow = createGameWindow(400, 400);
+        }
+        addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -51,39 +60,16 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
+    protected GameWindow createGameWindow(int wight, int height) {
+        GameWindow gameWindow = new GameWindow();
+        gameWindow.setSize(wight, height);
+        return gameWindow;
+    }
+
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
     }
-
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-// 
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-// 
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        return menuBar;
-//    }
 
     private void programExit(ActionEvent e) {
         int confirmed = JOptionPane.showOptionDialog(
@@ -96,6 +82,8 @@ public class MainApplicationFrame extends JFrame {
         );
 
         if (confirmed == JOptionPane.YES_OPTION) {
+            gameWindow.save(null, "");
+            logWindow.save(null, "");
             dispose();
             System.exit(0);
         }
@@ -156,6 +144,7 @@ public class MainApplicationFrame extends JFrame {
         menuBar.add(lookAndFeelMenu());
         menuBar.add(testMenu());
         menuBar.add(exitMenu());
+        //menuBar.add(saveLoadMenu());
 
         return menuBar;
     }

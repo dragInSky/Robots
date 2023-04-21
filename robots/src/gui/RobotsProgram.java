@@ -17,7 +17,11 @@ public class RobotsProgram {
         }
 
         SwingUtilities.invokeLater(() -> {
-            MainApplicationFrame frame = new MainApplicationFrame();
+            //загрузка окон, если загружать нечего инициализиуем null
+            MainApplicationFrame frame = new MainApplicationFrame(
+                    GameWindow.getGameWindowInstance(),
+                    LogWindow.getLogWindowInstance()
+            );
             frame.pack();
             frame.setVisible(true);
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
