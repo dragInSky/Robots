@@ -15,10 +15,9 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Seri
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
 
-    private LogWindow() {
-        m_logSource = null;
-        m_logContent = null;
-
+    private LogWindow(LogWindowSource logWindowSource, TextArea textArea) {
+        m_logSource = logWindowSource;
+        m_logContent = textArea;
     }
 
     public LogWindow(LogWindowSource logSource) {
@@ -35,8 +34,8 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Seri
         updateLogContent();
     }
 
-    public static LogWindow getLogWindowInstance() {
-        return new LogWindow();
+    public static LogWindow getInstance() {
+        return new LogWindow(null, null);
     }
 
     private void updateLogContent() {
@@ -51,5 +50,21 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Seri
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public FrameState getFrameState() {
+        return new FrameState(this.getHeight(), this.getWidth(), this.getX(), this.getY(),
+                this.isClosed, this.isIcon, this.isMaximum, this.isSelected);
+    }
+
+    @Override
+    public void setState(FrameState frameState) {
+        this.setSize(frameState.width, frameState.height);
+        this.setLocation(frameState.xPos, frameState.yPos);
+        this.isClosed = frameState.isClosed;
+        this.isIcon = frameState.isIcon;
+        this.isMaximum = frameState.isMaximum;
+        this.isSelected = frameState.isSelected;
     }
 }

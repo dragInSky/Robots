@@ -17,10 +17,9 @@ public class RobotsProgram {
         }
 
         SwingUtilities.invokeLater(() -> {
-            //загрузка окон, если загружать нечего инициализиуем null
             MainApplicationFrame frame = new MainApplicationFrame(
-                    GameWindow.getGameWindowInstance(),
-                    LogWindow.getLogWindowInstance()
+                    GameWindow.getInstance(),
+                    LogWindow.getInstance()
             );
             frame.pack();
             frame.setVisible(true);

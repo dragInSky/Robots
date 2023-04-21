@@ -15,12 +15,12 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final GameWindow gameWindow;
-    private final LogWindow logWindow;
+    private GameWindow gameWindow;
+    private LogWindow logWindow;
 
-    public MainApplicationFrame(GameWindow gameWindow, LogWindow logWindow/*, Adapter adapter*/) {
-        this.gameWindow = gameWindow;
-        this.logWindow = logWindow;
+    public MainApplicationFrame(GameWindow initGameWindow, LogWindow initLogWindow/*, Adapter adapter*/) {
+        gameWindow = initGameWindow;
+        logWindow = initLogWindow;
 
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -30,16 +30,12 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        boolean successLogWindowLoad = logWindow.load(null, "");
-        if (!successLogWindowLoad) {
-            logWindow = createLogWindow(inset, screenSize);
-        }
+        logWindow = createLogWindow(inset, screenSize);
+        logWindow.load("logWindow.dat");
         addWindow(logWindow);
 
-        boolean successGameWindowLoad = gameWindow.load(null, "");
-        if (!successGameWindowLoad) {
-            gameWindow = createGameWindow(400, 400);
-        }
+        gameWindow = createGameWindow(400, 400);
+        gameWindow.load("gameWindow.dat");
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
@@ -71,6 +67,17 @@ public class MainApplicationFrame extends JFrame {
         frame.setVisible(true);
     }
 
+    private void saveWindows() {
+        gameWindow.save("gameWindow.dat");
+        logWindow.save("logWindow.dat");
+    }
+
+    private void loadWindows() {
+        gameWindow.load("gameWindow.dat");
+        logWindow.load("logWindow.dat");
+        this.invalidate();
+    }
+
     private void programExit(ActionEvent e) {
         int confirmed = JOptionPane.showOptionDialog(
                 null,
@@ -82,8 +89,7 @@ public class MainApplicationFrame extends JFrame {
         );
 
         if (confirmed == JOptionPane.YES_OPTION) {
-            gameWindow.save(null, "");
-            logWindow.save(null, "");
+            saveWindows();
             dispose();
             System.exit(0);
         }
@@ -97,7 +103,6 @@ public class MainApplicationFrame extends JFrame {
         return jMenu;
     }
 
-    //Либо передавать структуру, либо создавать по одной менюшке
     private void generateMenuItems(
             JMenu jMenu, int externalKeyEvents, String texts, ActionListener actionListener) {
         JMenuItem jMenuItem = new JMenuItem(texts, externalKeyEvents);
@@ -106,10 +111,10 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private JMenu lookAndFeelMenu() {
-        JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_V,
+        JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_U,
                 "Режим отображения", "Управление режимом отображения приложения"
         );
-        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_S, "Системная схема",
+        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_M, "Системная схема",
                 event -> {
                     setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     this.invalidate();
@@ -138,13 +143,22 @@ public class MainApplicationFrame extends JFrame {
         return exitMenu;
     }
 
+    private JMenu saveLoadMenu() {
+        JMenu saveLoadMenu = generateMenu(KeyEvent.VK_L,
+                "Сохранение и загрузка", "Сохранение и загрузка состояния приложения"
+        );
+        generateMenuItems(saveLoadMenu, KeyEvent.VK_S, "Сохранение", event -> saveWindows());
+        generateMenuItems(saveLoadMenu, KeyEvent.VK_L, "Загрузка", event -> loadWindows());
+        return saveLoadMenu;
+    }
+
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         menuBar.add(lookAndFeelMenu());
         menuBar.add(testMenu());
         menuBar.add(exitMenu());
-        //menuBar.add(saveLoadMenu());
+        menuBar.add(saveLoadMenu());
 
         return menuBar;
     }

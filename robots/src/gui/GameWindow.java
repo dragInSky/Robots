@@ -8,8 +8,8 @@ import javax.swing.JPanel;
 public class GameWindow extends JInternalFrame implements SerializableFrame {
     private final GameVisualizer m_visualizer;
 
-    private GameWindow(Object initializer) {
-        m_visualizer = (GameVisualizer) initializer;
+    private GameWindow(GameVisualizer gameVisualizer) {
+        m_visualizer = gameVisualizer;
     }
 
     public GameWindow() {
@@ -21,17 +21,23 @@ public class GameWindow extends JInternalFrame implements SerializableFrame {
         pack();
     }
 
-    public static GameWindow getGameWindowInstance() {
+    public static GameWindow getInstance() {
         return new GameWindow(null);
     }
 
     @Override
-    public boolean save(JInternalFrame frame, String outPath) {
-        return false;
+    public FrameState getFrameState() {
+        return new FrameState(this.getHeight(), this.getWidth(), this.getX(), this.getY(),
+                this.isClosed, this.isIcon, this.isMaximum, this.isSelected);
     }
 
     @Override
-    public boolean load(JInternalFrame frame, String inPath) {
-        return false;
+    public void setState(FrameState frameState) {
+        this.setSize(frameState.width, frameState.height);
+        this.setLocation(frameState.xPos, frameState.yPos);
+        this.isClosed = frameState.isClosed;
+        this.isIcon = frameState.isIcon;
+        this.isMaximum = frameState.isMaximum;
+        this.isSelected = frameState.isSelected;
     }
 }

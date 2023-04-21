@@ -1,13 +1,21 @@
 package gui;
 
-import javax.swing.*;
-
 public interface SerializableFrame {
-    default boolean save(JInternalFrame frame, String outPath) {
-        return false;
+    FrameState getFrameState();
+
+    void setState(FrameState frameState);
+
+    default boolean save(String outPath) {
+        return getFrameState().save(outPath);
     }
 
-    default boolean load(JInternalFrame frame, String inPath) {
-        return false;
+    default boolean load(String inPath) {
+        FrameState frameState = new FrameState();
+        boolean isSuccessLoad = frameState.load(inPath);
+        if (!isSuccessLoad) {
+            return false;
+        }
+        setState(frameState);
+        return true;
     }
 }
