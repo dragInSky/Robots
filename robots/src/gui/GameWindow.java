@@ -1,15 +1,10 @@
 package gui;
 
-import serialization.FrameState;
-import serialization.SerializableFrame;
-
+import serialization.SerializableInternalFrame;
 import java.awt.BorderLayout;
-import java.beans.PropertyVetoException;
-
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
-public class GameWindow extends JInternalFrame implements SerializableFrame {
+public class GameWindow extends SerializableInternalFrame {
     private final GameVisualizer m_visualizer;
 
     private GameWindow(GameVisualizer gameVisualizer) {
@@ -17,7 +12,7 @@ public class GameWindow extends JInternalFrame implements SerializableFrame {
     }
 
     public GameWindow() {
-        super("Игровое поле", true, true, true, true);
+        super();
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_visualizer, BorderLayout.CENTER);
@@ -27,23 +22,5 @@ public class GameWindow extends JInternalFrame implements SerializableFrame {
 
     public static GameWindow getInstance() {
         return new GameWindow(null);
-    }
-
-    @Override
-    public FrameState getFrameState() {
-        return new FrameState(this.getSize(), this.getLocation(), this.isIcon, this.isMaximum, this.isSelected);
-    }
-
-    @Override
-    public void setState(FrameState frameState) {
-        try {
-            this.setSize(frameState.size);
-            this.setLocation(frameState.location);
-            this.setIcon(frameState.isIcon);
-            this.setMaximum(frameState.isMaximum);
-            this.setSelected(frameState.isSelected);
-        } catch (PropertyVetoException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
