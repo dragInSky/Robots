@@ -11,6 +11,8 @@ import javax.swing.JPanel;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+import serialization.FrameState;
+import serialization.SerializableFrame;
 
 public class LogWindow extends JInternalFrame implements LogChangeListener, SerializableFrame {
     private final LogWindowSource m_logSource;
@@ -55,16 +57,14 @@ public class LogWindow extends JInternalFrame implements LogChangeListener, Seri
 
     @Override
     public FrameState getFrameState() {
-        return new FrameState(this.getHeight(), this.getWidth(), this.getX(), this.getY(),
-                this.isClosed, this.isIcon, this.isMaximum, this.isSelected);
+        return new FrameState(this.getSize(), this.getLocation(), this.isIcon, this.isMaximum, this.isSelected);
     }
 
     @Override
     public void setState(FrameState frameState) {
         try {
-            this.setSize(frameState.width, frameState.height);
-            this.setLocation(frameState.xPos, frameState.yPos);
-            this.setClosed(frameState.isClosed);
+            this.setSize(frameState.size);
+            this.setLocation(frameState.location);
             this.setIcon(frameState.isIcon);
             this.setMaximum(frameState.isMaximum);
             this.setSelected(frameState.isSelected);

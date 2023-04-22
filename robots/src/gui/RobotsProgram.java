@@ -1,5 +1,7 @@
 package gui;
 
+import serialization.ProgramState;
+
 import java.awt.Frame;
 
 import javax.swing.SwingUtilities;

@@ -1,5 +1,8 @@
 package gui;
 
+import serialization.FrameState;
+import serialization.SerializableFrame;
+
 import java.awt.BorderLayout;
 import java.beans.PropertyVetoException;
 
@@ -28,17 +31,14 @@ public class GameWindow extends JInternalFrame implements SerializableFrame {
 
     @Override
     public FrameState getFrameState() {
-        System.out.println(this.isClosed);
-        return new FrameState(this.getHeight(), this.getWidth(), this.getX(), this.getY(),
-                this.isClosed, this.isIcon, this.isMaximum, this.isSelected);
+        return new FrameState(this.getSize(), this.getLocation(), this.isIcon, this.isMaximum, this.isSelected);
     }
 
     @Override
     public void setState(FrameState frameState) {
         try {
-            this.setSize(frameState.width, frameState.height);
-            this.setLocation(frameState.xPos, frameState.yPos);
-            this.setClosed(frameState.isClosed);
+            this.setSize(frameState.size);
+            this.setLocation(frameState.location);
             this.setIcon(frameState.isIcon);
             this.setMaximum(frameState.isMaximum);
             this.setSelected(frameState.isSelected);

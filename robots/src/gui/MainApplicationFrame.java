@@ -7,6 +7,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import log.Logger;
+import serialization.ProgramState;
 
 /**
  * Что требуется сделать:
