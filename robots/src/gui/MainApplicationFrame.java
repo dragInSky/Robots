@@ -1,8 +1,8 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.*;
+import java.io.FileInputStream;
 import java.util.Properties;
 
 import javax.swing.*;
@@ -19,13 +19,16 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final GameWindow gameWindow;
     private final LogWindow logWindow;
-    private final ProgramState programState;
-    private final Properties cfg;
+    private final ProgramState programState = new ProgramState();
+    private final Properties cfg = new Properties();
 
-    public MainApplicationFrame(Properties cfg, boolean isGameWindowSerializable, boolean isLogWindowSerializable,
-                                ProgramState programState/*, Adapter adapter*/) {
-        this.cfg = cfg;
-        this.programState = programState;
+    public MainApplicationFrame(/*, Adapter adapter*/) {
+        String cfgFilePath = "config.properties";
+        try (FileInputStream cfgInput = new FileInputStream(cfgFilePath)) {
+            cfg.load(cfgInput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -35,8 +38,8 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        logWindow = createLogWindow(isLogWindowSerializable, inset, screenSize);
-        gameWindow = createGameWindow(isGameWindowSerializable, 400, 400);
+        logWindow = new LogWindow(inset, screenSize);
+        gameWindow = new GameWindow(400, 400);
 
         addWindow(logWindow);
         addWindow(gameWindow);
@@ -47,41 +50,36 @@ public class MainApplicationFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    protected LogWindow createLogWindow(boolean isLogWindowSerializable, int inset, Dimension screenSize) {
-        LogWindow logWindow = new LogWindow(isLogWindowSerializable, Logger.getDefaultLogSource());
-
-        int width = 300;
-        logWindow.setLocation(screenSize.width - width - 10 + inset * 2, 0);
-
-        logWindow.setSize(width, screenSize.height);
-        setMinimumSize(logWindow.getSize());
-        logWindow.pack();
-        //Logger.debug(adapter.Translate("Протокол работает");
-        Logger.debug("Протокол работает");
-        return logWindow;
-    }
-
-    protected GameWindow createGameWindow(boolean isGameWindowSerializable, int wight, int height) {
-        GameWindow gameWindow = new GameWindow(isGameWindowSerializable);
-        gameWindow.setSize(wight, height);
-        return gameWindow;
-    }
-
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
     }
 
+    private void updateProgramState() {
+        programState.className = UIManager.getLookAndFeel().getClass().getName();
+    }
+
     private void saveWindows() {
-        if (gameWindow.isSerializable()) gameWindow.save(cfg.getProperty("gameWindowOutPath"));
-        if (logWindow.isSerializable()) logWindow.save(cfg.getProperty("logWindowOutPath"));
-        if (programState.isSerializable()) programState.save(cfg.getProperty("programStateOutPath"));
+        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
+            gameWindow.save(cfg.getProperty("gameWindowOutPath"));
+        }
+        if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
+            logWindow.save(cfg.getProperty("logWindowOutPath"));
+        }
+        if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {
+            updateProgramState();
+            programState.save(cfg.getProperty("programStateOutPath"));
+        }
     }
 
     private void loadWindows() {
-        if (gameWindow.isSerializable()) gameWindow.load(cfg.getProperty("gameWindowOutPath"));
-        if (logWindow.isSerializable()) logWindow.load(cfg.getProperty("logWindowOutPath"));
-        if (programState.isSerializable()) {
+        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
+            gameWindow.load(cfg.getProperty("gameWindowOutPath"));
+        }
+        if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
+            logWindow.load(cfg.getProperty("logWindowOutPath"));
+        }
+        if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {
             programState.load(cfg.getProperty("programStateOutPath"));
             setLookAndFeel(programState.className);
         }
@@ -123,22 +121,13 @@ public class MainApplicationFrame extends JFrame {
                 "Режим отображения", "Управление режимом отображения приложения"
         );
         generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Облачная схема",
-                event -> {
-                    setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-                    this.invalidate();
-                }
+                event -> setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
         );
         generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Системная схема",
-                event -> {
-                    setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    this.invalidate();
-                }
+                event -> setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         );
         generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Универсальная схема",
-                event -> {
-                    setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                    this.invalidate();
-                }
+                event -> setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName())
         );
         return lookAndFeelMenu;
     }
@@ -179,12 +168,12 @@ public class MainApplicationFrame extends JFrame {
 
     private void setLookAndFeel(String className) {
         try {
-            programState.className = className;
             UIManager.setLookAndFeel(className);
             SwingUtilities.updateComponentTreeUI(this);
         } catch (ClassNotFoundException | InstantiationException
                  | IllegalAccessException | UnsupportedLookAndFeelException e) {
             // just ignore
         }
+        this.invalidate();
     }
 }

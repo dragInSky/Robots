@@ -1,22 +1,19 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.TextArea;
+import java.awt.*;
 import javax.swing.JPanel;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+import log.Logger;
 import serialization.SerializableInternalFrame;
 
 public class LogWindow extends SerializableInternalFrame implements LogChangeListener {
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
-    private final boolean isSerializable;
 
-    public LogWindow(boolean isSerializable, LogWindowSource logSource) {
+    public LogWindow(LogWindowSource logSource) {
         super();
-        this.isSerializable = isSerializable;
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -27,6 +24,19 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
         getContentPane().add(panel);
         pack();
         updateLogContent();
+    }
+
+    public LogWindow(int inset, Dimension screenSize) {
+        this(Logger.getDefaultLogSource());
+
+        int width = 300;
+        this.setLocation(screenSize.width - width - 10 + inset * 2, 0);
+
+        this.setSize(width, screenSize.height);
+        setMinimumSize(this.getSize());
+        this.pack();
+        //Logger.debug(adapter.Translate("Протокол работает");
+        Logger.debug("Протокол работает");
     }
 
     private void updateLogContent() {
@@ -41,10 +51,5 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
-    }
-
-    @Override
-    public boolean isSerializable() {
-        return isSerializable;
     }
 }

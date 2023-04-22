@@ -1,17 +1,12 @@
 package serialization;
 
+import javax.swing.*;
+
 public class ProgramState implements SerializableStruct {
     public String className;
-    private final boolean isSerializable;
 
-    public ProgramState(boolean isSerializable, String className) {
-        this.isSerializable = isSerializable;
-        this.className = className;
-    }
-
-    @Override
-    public boolean isSerializable() {
-        return isSerializable;
+    public ProgramState() {
+        className = UIManager.getLookAndFeel().getName();
     }
 
     @Override

@@ -9,8 +9,6 @@ abstract public class SerializableInternalFrame extends JInternalFrame {
         super("Игровое поле", true, true, true, true);
     }
 
-    abstract public boolean isSerializable();
-
     private FrameState getFrameState() {
         return new FrameState(this.getSize(), this.getLocation(), this.isIcon, this.isMaximum, this.isSelected);
     }
@@ -23,7 +21,7 @@ abstract public class SerializableInternalFrame extends JInternalFrame {
             this.setMaximum(frameState.isMaximum);
             this.setSelected(frameState.isSelected);
         } catch (PropertyVetoException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
     }
 

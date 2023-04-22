@@ -8,8 +8,7 @@ public class FrameState implements SerializableStruct {
     public boolean isIcon, isMaximum, isSelected;
 
     public FrameState() {
-        fillFields(new Dimension(0, 0), new Point(0, 0),
-                false, false, false);
+        fillFields(new Dimension(0, 0), new Point(0, 0), false, false, false);
     }
 
     public FrameState(Dimension size, Point location, boolean isIcon, boolean isMaximum, boolean isSelected) {
@@ -22,11 +21,6 @@ public class FrameState implements SerializableStruct {
         this.isIcon = isIcon;
         this.isMaximum = isMaximum;
         this.isSelected = isSelected;
-    }
-
-    @Override
-    public boolean isSerializable() {
-        return true;
     }
 
     @Override
