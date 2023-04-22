@@ -12,14 +12,11 @@ import serialization.SerializableInternalFrame;
 public class LogWindow extends SerializableInternalFrame implements LogChangeListener {
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
+    private final boolean isSerializable;
 
-    private LogWindow(LogWindowSource logWindowSource, TextArea textArea) {
-        m_logSource = logWindowSource;
-        m_logContent = textArea;
-    }
-
-    public LogWindow(LogWindowSource logSource) {
+    public LogWindow(boolean isSerializable, LogWindowSource logSource) {
         super();
+        this.isSerializable = isSerializable;
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -30,10 +27,6 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
         getContentPane().add(panel);
         pack();
         updateLogContent();
-    }
-
-    public static LogWindow getInstance() {
-        return new LogWindow(null, null);
     }
 
     private void updateLogContent() {
@@ -48,5 +41,10 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public boolean isSerializable() {
+        return isSerializable;
     }
 }

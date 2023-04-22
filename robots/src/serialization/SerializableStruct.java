@@ -3,6 +3,8 @@ package serialization;
 import java.io.*;
 
 public interface SerializableStruct extends Serializable {
+    boolean isSerializable();
+
     void copy(Object object);
 
     default void save(String outPath) {

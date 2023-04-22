@@ -6,13 +6,11 @@ import javax.swing.JPanel;
 
 public class GameWindow extends SerializableInternalFrame {
     private final GameVisualizer m_visualizer;
+    private final boolean isSerializable;
 
-    private GameWindow(GameVisualizer gameVisualizer) {
-        m_visualizer = gameVisualizer;
-    }
-
-    public GameWindow() {
+    public GameWindow(boolean isSerializable) {
         super();
+        this.isSerializable = isSerializable;
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_visualizer, BorderLayout.CENTER);
@@ -20,7 +18,8 @@ public class GameWindow extends SerializableInternalFrame {
         pack();
     }
 
-    public static GameWindow getInstance() {
-        return new GameWindow(null);
+    @Override
+    public boolean isSerializable() {
+        return isSerializable;
     }
 }

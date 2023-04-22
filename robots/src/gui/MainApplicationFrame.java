@@ -3,6 +3,7 @@ package gui;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.*;
+import java.util.Properties;
 
 import javax.swing.*;
 
@@ -16,15 +17,15 @@ import serialization.ProgramState;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private GameWindow gameWindow;
-    private LogWindow logWindow;
-    private ProgramState programState;
+    private final GameWindow gameWindow;
+    private final LogWindow logWindow;
+    private final ProgramState programState;
+    private final Properties cfg;
 
-    public MainApplicationFrame(GameWindow initGameWindow, LogWindow initLogWindow, ProgramState initProgramState
-            /*, Adapter adapter*/) {
-        gameWindow = initGameWindow;
-        logWindow = initLogWindow;
-        programState = initProgramState;
+    public MainApplicationFrame(Properties cfg, boolean isGameWindowSerializable, boolean isLogWindowSerializable,
+                                ProgramState programState/*, Adapter adapter*/) {
+        this.cfg = cfg;
+        this.programState = programState;
 
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -34,8 +35,8 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        logWindow = createLogWindow(inset, screenSize);
-        gameWindow = createGameWindow(400, 400);
+        logWindow = createLogWindow(isLogWindowSerializable, inset, screenSize);
+        gameWindow = createGameWindow(isGameWindowSerializable, 400, 400);
 
         addWindow(logWindow);
         addWindow(gameWindow);
@@ -46,8 +47,8 @@ public class MainApplicationFrame extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    protected LogWindow createLogWindow(int inset, Dimension screenSize) {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
+    protected LogWindow createLogWindow(boolean isLogWindowSerializable, int inset, Dimension screenSize) {
+        LogWindow logWindow = new LogWindow(isLogWindowSerializable, Logger.getDefaultLogSource());
 
         int width = 300;
         logWindow.setLocation(screenSize.width - width - 10 + inset * 2, 0);
@@ -60,8 +61,8 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
-    protected GameWindow createGameWindow(int wight, int height) {
-        GameWindow gameWindow = new GameWindow();
+    protected GameWindow createGameWindow(boolean isGameWindowSerializable, int wight, int height) {
+        GameWindow gameWindow = new GameWindow(isGameWindowSerializable);
         gameWindow.setSize(wight, height);
         return gameWindow;
     }
@@ -72,16 +73,18 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void saveWindows() {
-        gameWindow.save("gameWindow.dat");
-        logWindow.save("logWindow.dat");
-        programState.save("programState.dat");
+        if (gameWindow.isSerializable()) gameWindow.save(cfg.getProperty("gameWindowOutPath"));
+        if (logWindow.isSerializable()) logWindow.save(cfg.getProperty("logWindowOutPath"));
+        if (programState.isSerializable()) programState.save(cfg.getProperty("programStateOutPath"));
     }
 
     private void loadWindows() {
-        gameWindow.load("gameWindow.dat");
-        logWindow.load("logWindow.dat");
-        programState.load("programState.dat");
-        setLookAndFeel(programState.className);
+        if (gameWindow.isSerializable()) gameWindow.load(cfg.getProperty("gameWindowOutPath"));
+        if (logWindow.isSerializable()) logWindow.load(cfg.getProperty("logWindowOutPath"));
+        if (programState.isSerializable()) {
+            programState.load(cfg.getProperty("programStateOutPath"));
+            setLookAndFeel(programState.className);
+        }
         this.invalidate();
     }
 
@@ -148,12 +151,6 @@ public class MainApplicationFrame extends JFrame {
         return testMenu;
     }
 
-    private JMenu exitMenu() {
-        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
-        generateMenuItems(exitMenu, KeyEvent.VK_Z, "Закрытие приложения", this::programExit);
-        return exitMenu;
-    }
-
     private JMenu saveLoadMenu() {
         JMenu saveLoadMenu = generateMenu(KeyEvent.VK_L,
                 "Сохранение и загрузка", "Сохранение и загрузка состояния приложения"
@@ -163,20 +160,26 @@ public class MainApplicationFrame extends JFrame {
         return saveLoadMenu;
     }
 
+    private JMenu exitMenu() {
+        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
+        generateMenuItems(exitMenu, KeyEvent.VK_Z, "Закрытие приложения", this::programExit);
+        return exitMenu;
+    }
+
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
         menuBar.add(lookAndFeelMenu());
         menuBar.add(testMenu());
-        menuBar.add(exitMenu());
         menuBar.add(saveLoadMenu());
+        menuBar.add(exitMenu());
 
         return menuBar;
     }
 
     private void setLookAndFeel(String className) {
         try {
-            programState = new ProgramState(className);
+            programState.className = className;
             UIManager.setLookAndFeel(className);
             SwingUtilities.updateComponentTreeUI(this);
         } catch (ClassNotFoundException | InstantiationException

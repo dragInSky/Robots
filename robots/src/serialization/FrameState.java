@@ -25,6 +25,11 @@ public class FrameState implements SerializableStruct {
     }
 
     @Override
+    public boolean isSerializable() {
+        return true;
+    }
+
+    @Override
     public void copy(Object objFrameState) {
         FrameState frameState = (FrameState) objFrameState;
         fillFields(frameState.size, frameState.location,
