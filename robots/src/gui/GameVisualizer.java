@@ -76,7 +76,9 @@ public class GameVisualizer extends JPanel {
     }
 
     protected void onModelUpdateEvent() {
-        if (distance(m_targetPositionX, m_targetPositionY, m_robotPositionX, m_robotPositionY) < 0.5) {
+        if (distance(m_targetPositionX, m_targetPositionY, m_robotPositionX, m_robotPositionY) < 1) {
+            m_robotPositionX = m_targetPositionX;
+            m_robotPositionY = m_targetPositionY;
             return;
         }
 
@@ -84,8 +86,7 @@ public class GameVisualizer extends JPanel {
         double angularVelocity = 0;
         if (angleToTarget > m_robotDirection) {
             angularVelocity = maxAngularVelocity;
-        }
-        else if (angleToTarget < m_robotDirection) {
+        } else if (angleToTarget < m_robotDirection) {
             angularVelocity = -maxAngularVelocity;
         }
 
@@ -101,19 +102,25 @@ public class GameVisualizer extends JPanel {
 
     private void moveRobot(double velocity, double angularVelocity, double duration) {
         velocity = applyLimits(velocity, 0, maxVelocity);
-        angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
-        double newX =
-                m_robotPositionX + velocity / angularVelocity *
-                        (Math.sin(m_robotDirection + angularVelocity * duration) -
-                                Math.sin(m_robotDirection));
-        if (!Double.isFinite(newX)) {
-            newX = m_robotPositionX + velocity * duration * Math.cos(m_robotDirection);
-        }
-        double newY = m_robotPositionY - velocity / angularVelocity *
-                (Math.cos(m_robotDirection + angularVelocity * duration) -
-                        Math.cos(m_robotDirection));
-        if (!Double.isFinite(newY)) {
-            newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
+        double newX, newY;
+
+        if (angularVelocity == 0) {
+            newX = m_robotPositionX + velocity * Math.cos(m_robotDirection) * duration;
+            newY = m_robotPositionY + velocity * Math.sin(m_robotDirection) * duration;
+        } else {
+            angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
+            newX = m_robotPositionX + velocity / angularVelocity *
+                    (Math.sin(m_robotDirection + angularVelocity * duration) -
+                            Math.sin(m_robotDirection));
+            if (!Double.isFinite(newX)) {
+                newX = m_robotPositionX + velocity * duration * Math.cos(m_robotDirection);
+            }
+            newY = m_robotPositionY - velocity / angularVelocity *
+                    (Math.cos(m_robotDirection + angularVelocity * duration) -
+                            Math.cos(m_robotDirection));
+            if (!Double.isFinite(newY)) {
+                newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
+            }
         }
 
         int width = gameWindow.getWidth() * 2 - 20;
