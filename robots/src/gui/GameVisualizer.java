@@ -18,12 +18,17 @@ public class GameVisualizer extends JPanel {
     private volatile int m_targetPositionX = 150;
     private volatile int m_targetPositionY = 100;
 
-    private static final double maxVelocity = 0.1;
-    private static final double maxAngularVelocity = 0.001;
+    private int count = 0;
+
+    private static final double maxVelocity = 0.15;
+    private static final double maxAngularVelocity = 0.004;
+
+    private final GameWindow gameWindow;
 
     private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
-    public GameVisualizer(CoordinatesWindow coordinatesWindow) {
+    public GameVisualizer(GameWindow gameWindow, CoordinatesWindow coordinatesWindow) {
+        this.gameWindow = gameWindow;
         support.addPropertyChangeListener(coordinatesWindow);
 
         Timer timer = new Timer("events generator", true);
@@ -32,7 +37,7 @@ public class GameVisualizer extends JPanel {
             public void run() {
                 onRedrawEvent();
             }
-        }, 0, 50);
+        }, 0, 10);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -111,9 +116,29 @@ public class GameVisualizer extends JPanel {
             newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
         }
 
-        support.firePropertyChange("coordinates",
-                new DoublePoint(m_robotPositionX, m_robotPositionY), new DoublePoint(newX, newY)
-        );
+        int width = gameWindow.getWidth() * 2 - 20;
+        if (newX < 0) {
+            newX += width;
+        } else if (newX > width) {
+            newX -= width;
+        }
+
+        int height = gameWindow.getHeight() * 2 - 40;
+        if (newY < 0) {
+            newY += height;
+        } else if (newY > height) {
+            newY -= height;
+        }
+
+        if ((int) m_robotPositionX != (int) newX || (int) m_robotPositionY != (int) newY) {
+            count++;
+            if (count == 5) {
+                support.firePropertyChange("coordinates",
+                        new Point((int) m_robotPositionX, (int) m_robotPositionY), new Point((int) newX, (int) newY)
+                );
+                count = 0;
+            }
+        }
 
         m_robotPositionX = newX;
         m_robotPositionY = newY;
