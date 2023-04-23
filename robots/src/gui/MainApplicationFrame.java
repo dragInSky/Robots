@@ -23,6 +23,7 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final CoordinatesWindow coordinatesWindow;
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -35,11 +36,13 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
+        coordinatesWindow = createCoordinatesWindow();
+        addWindow(coordinatesWindow);
 
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
 
-        GameWindow gameWindow = new GameWindow();
+        GameWindow gameWindow = new GameWindow(coordinatesWindow);
         gameWindow.setSize(400, 400);
         addWindow(gameWindow);
 
@@ -49,8 +52,7 @@ public class MainApplicationFrame extends JFrame {
 
     protected LogWindow createLogWindow() {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10, 10);
-        logWindow.setSize(300, 800);
+        logWindow.setLocation(1070, 0);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
         Logger.debug("Протокол работает");
@@ -60,6 +62,14 @@ public class MainApplicationFrame extends JFrame {
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+    }
+
+    protected CoordinatesWindow createCoordinatesWindow() {
+        CoordinatesWindow coordinatesWindow = new CoordinatesWindow();
+        coordinatesWindow.setLocation(400, 0);
+        setMinimumSize(coordinatesWindow.getSize());
+        coordinatesWindow.pack();
+        return coordinatesWindow;
     }
 
 //    protected JMenuBar createMenuBar() {
