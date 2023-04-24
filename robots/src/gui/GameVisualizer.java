@@ -72,7 +72,7 @@ public class GameVisualizer extends JPanel {
     }
 
     private static double angleTo(double fromX, double fromY, double toX, double toY) {
-        return asNormalizedRadians(Math.atan2((toY - fromY), (toX - fromX)));
+        return asNormalizedRadians(Math.atan2((toY - fromY), (toX - fromX)) - Math.PI);
     }
 
     protected void onModelUpdateEvent() {
@@ -83,11 +83,11 @@ public class GameVisualizer extends JPanel {
         }
 
         double angleToTarget = angleTo(m_robotPositionX, m_robotPositionY, m_targetPositionX, m_targetPositionY);
-        double angularVelocity = 0;
-        if (angleToTarget > m_robotDirection) {
-            angularVelocity = maxAngularVelocity;
-        } else if (angleToTarget < m_robotDirection) {
-            angularVelocity = -maxAngularVelocity;
+        double angularVelocity;
+        if (Math.abs(angleToTarget - m_robotDirection) > maxAngularVelocity) {
+            angularVelocity = Math.signum(angleToTarget - m_robotDirection) * maxAngularVelocity;
+        } else {
+            angularVelocity = angleToTarget - m_robotDirection;
         }
 
         moveRobot(maxVelocity, angularVelocity, 10);
@@ -154,10 +154,10 @@ public class GameVisualizer extends JPanel {
     }
 
     private static double asNormalizedRadians(double angle) {
-        while (angle < 0) {
+        while (angle < -Math.PI) {
             angle += 2 * Math.PI;
         }
-        while (angle >= 2 * Math.PI) {
+        while (angle > Math.PI) {
             angle -= 2 * Math.PI;
         }
         return angle;
