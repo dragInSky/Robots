@@ -91,39 +91,32 @@ public class MainApplicationFrame extends JFrame {
         JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_V,
                 "Режим отображения", "Управление режимом отображения приложения"
         );
-        JMenuItem lookAndFeelMenuItem1 = generateMenuItems(KeyEvent.VK_S, "Системная схема",
+        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_S, "Системная схема",
                 event -> {
                     setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     this.invalidate();
                 }
-        );
-        JMenuItem lookAndFeelMenuItem2 = generateMenuItems(KeyEvent.VK_U, "Универсальная схема",
+        ));
+        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_U, "Универсальная схема",
                 event -> {
                     setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                     this.invalidate();
                 }
-        );
-
-        lookAndFeelMenu.add(lookAndFeelMenuItem1);
-        lookAndFeelMenu.add(lookAndFeelMenuItem2);
+        ));
         return lookAndFeelMenu;
     }
 
     private JMenu testMenu() {
         JMenu testMenu = generateMenu(KeyEvent.VK_T, "Тесты", "Тестовые команды");
-        JMenuItem testMenuItem = generateMenuItems(KeyEvent.VK_T, "Сообщение в лог",
+        testMenu.add(generateMenuItems(KeyEvent.VK_T, "Сообщение в лог",
                 event -> Logger.debug("Новая строка")
-        );
-
-        testMenu.add(testMenuItem);
+        ));
         return testMenu;
     }
 
     private JMenu exitMenu() {
         JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
-        JMenuItem exitMenuItem = generateMenuItems(KeyEvent.VK_Z, "Закрытие приложения", this::programExit);
-
-        exitMenu.add(exitMenuItem);
+        exitMenu.add(generateMenuItems(KeyEvent.VK_Z, "Закрытие приложения", this::programExit));
         return exitMenu;
     }
 
