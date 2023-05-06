@@ -1,5 +1,8 @@
 package gui;
 
+import locale.Language;
+import locale.LocaleAdapter;
+
 import java.awt.Frame;
 
 import javax.swing.SwingUtilities;
@@ -17,7 +20,7 @@ public class RobotsProgram {
         }
 
         SwingUtilities.invokeLater(() -> {
-            MainApplicationFrame frame = new MainApplicationFrame();
+            MainApplicationFrame frame = new MainApplicationFrame(new LocaleAdapter(Language.ENGLISH));
             frame.pack();
             frame.setVisible(true);
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);

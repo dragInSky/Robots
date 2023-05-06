@@ -6,6 +6,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
+import locale.LocaleAdapter;
 import log.Logger;
 
 /**
@@ -15,8 +16,11 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final LocaleAdapter adapter;
 
-    public MainApplicationFrame(/*Adapter*/) {
+    public MainApplicationFrame(LocaleAdapter adapter) {
+        this.adapter = adapter;
+
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
         int inset = 50;
@@ -46,8 +50,7 @@ public class MainApplicationFrame extends JFrame {
         logWindow.setSize(width, screenSize.height);
         setMinimumSize(logWindow.getSize());
         logWindow.pack();
-        //Logger.debug(adapter.Translate("Протокол работает");
-        Logger.debug("Протокол работает");
+        Logger.debug(adapter.translate("Протокол работает"));
         return logWindow;
     }
 
@@ -59,11 +62,13 @@ public class MainApplicationFrame extends JFrame {
     private void programExit(ActionEvent e) {
         int confirmed = JOptionPane.showOptionDialog(
                 null,
-                "Вы точно хотите закрыть приложение?",
-                "Подтверджение выхода",
+                adapter.translate("Вы точно хотите закрыть приложение?"),
+                adapter.translate("Подтверджение выхода"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
-                null, new String[]{"Да", "Нет"}, null
+                null,
+                new String[]{adapter.translate("Да"), adapter.translate("Нет")},
+                null
         );
 
         if (confirmed == JOptionPane.YES_OPTION) {
@@ -89,15 +94,16 @@ public class MainApplicationFrame extends JFrame {
 
     private JMenu lookAndFeelMenu() {
         JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_V,
-                "Режим отображения", "Управление режимом отображения приложения"
+                adapter.translate("Режим отображения"),
+                adapter.translate("Управление режимом отображения приложения")
         );
-        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_S, "Системная схема",
+        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_S, adapter.translate("Системная схема"),
                 event -> {
                     setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     this.invalidate();
                 }
         ));
-        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_U, "Универсальная схема",
+        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_U, adapter.translate("Универсальная схема"),
                 event -> {
                     setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                     this.invalidate();
@@ -107,16 +113,20 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private JMenu testMenu() {
-        JMenu testMenu = generateMenu(KeyEvent.VK_T, "Тесты", "Тестовые команды");
-        testMenu.add(generateMenuItems(KeyEvent.VK_T, "Сообщение в лог",
-                event -> Logger.debug("Новая строка")
+        JMenu testMenu = generateMenu(
+                KeyEvent.VK_T, adapter.translate("Тесты"), adapter.translate("Тестовые команды")
+        );
+        testMenu.add(generateMenuItems(KeyEvent.VK_T, adapter.translate("Сообщение в лог"),
+                event -> Logger.debug(adapter.translate("Новая строка"))
         ));
         return testMenu;
     }
 
     private JMenu exitMenu() {
-        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
-        exitMenu.add(generateMenuItems(KeyEvent.VK_Z, "Закрытие приложения", this::programExit));
+        JMenu exitMenu = generateMenu(
+                KeyEvent.VK_Z, adapter.translate("Выход"), adapter.translate("Закрытие приложения")
+        );
+        exitMenu.add(generateMenuItems(KeyEvent.VK_Z, adapter.translate("Закрытие приложения"), this::programExit));
         return exitMenu;
     }
 
