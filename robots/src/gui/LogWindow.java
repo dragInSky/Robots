@@ -26,11 +26,11 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
         updateLogContent();
     }
 
-    public LogWindow(int inset, Dimension screenSize) {
+    public LogWindow(Dimension screenSize) {
         this(Logger.getDefaultLogSource());
 
         int width = 300;
-        this.setLocation(screenSize.width - width - 10 + inset * 2, 0);
+        this.setLocation(screenSize.width - width, 0);
 
         this.setSize(width, screenSize.height);
         setMinimumSize(this.getSize());
@@ -51,5 +51,15 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
+    }
+
+    @Override
+    public String isSerializable() {
+        return "isLogWindowSerializable";
+    }
+
+    @Override
+    public String getOutPath() {
+        return "logWindowOutPath";
     }
 }

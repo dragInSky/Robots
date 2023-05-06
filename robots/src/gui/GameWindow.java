@@ -16,6 +16,16 @@ public class GameWindow extends SerializableInternalFrame {
         pack();
     }
 
+    @Override
+    public String isSerializable() {
+        return "isGameWindowSerializable";
+    }
+
+    @Override
+    public String getOutPath() {
+        return "gameWindowOutPath";
+    }
+
     public GameWindow(int wight, int height) {
         this();
         setSize(wight, height);

@@ -36,4 +36,8 @@ abstract public class SerializableInternalFrame extends JInternalFrame {
             setWindowState(frameState);
         }
     }
+
+    public abstract String isSerializable();
+
+    public abstract String getOutPath();
 }

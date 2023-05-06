@@ -9,6 +9,7 @@ import javax.swing.*;
 
 import log.Logger;
 import serialization.ProgramState;
+import serialization.SerializableInternalFrame;
 
 /**
  * Что требуется сделать:
@@ -17,12 +18,13 @@ import serialization.ProgramState;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final GameWindow gameWindow;
-    private final LogWindow logWindow;
+    private final SerializableInternalFrame[] windows;
     private final ProgramState programState = new ProgramState();
     private final Properties cfg = new Properties();
 
-    public MainApplicationFrame(/*, Adapter adapter*/) {
+    public MainApplicationFrame(SerializableInternalFrame ... windows/*, Adapter adapter*/) {
+        this.windows = windows;
+
         String cfgFilePath = "config.properties";
         try (FileInputStream cfgInput = new FileInputStream(cfgFilePath)) {
             cfg.load(cfgInput);
@@ -38,11 +40,9 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        logWindow = new LogWindow(inset, screenSize);
-        gameWindow = new GameWindow(400, 400);
-
-        addWindow(logWindow);
-        addWindow(gameWindow);
+        for (SerializableInternalFrame window : windows) {
+            addWindow(window);
+        }
 
         loadWindows();
 
@@ -60,11 +60,10 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void saveWindows() {
-        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
-            gameWindow.save(cfg.getProperty("gameWindowOutPath"));
-        }
-        if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
-            logWindow.save(cfg.getProperty("logWindowOutPath"));
+        for (SerializableInternalFrame window : windows) {
+            if (Boolean.parseBoolean(cfg.getProperty(window.isSerializable()))) {
+                window.save(cfg.getProperty(window.getOutPath()));
+            }
         }
         if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {
             updateProgramState();
@@ -73,11 +72,10 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void loadWindows() {
-        if (Boolean.parseBoolean(cfg.getProperty("isGameWindowSerializable"))) {
-            gameWindow.load(cfg.getProperty("gameWindowOutPath"));
-        }
-        if (Boolean.parseBoolean(cfg.getProperty("isLogWindowSerializable"))) {
-            logWindow.load(cfg.getProperty("logWindowOutPath"));
+        for (SerializableInternalFrame window : windows) {
+            if (Boolean.parseBoolean(cfg.getProperty(window.isSerializable()))) {
+                window.load(cfg.getProperty(window.getOutPath()));
+            }
         }
         if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {
             programState.load(cfg.getProperty("programStateOutPath"));
