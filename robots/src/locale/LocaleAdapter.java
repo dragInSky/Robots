@@ -73,6 +73,14 @@ public class LocaleAdapter {
                 return language == Language.RUSSIAN ? "Закрытие приложения" :
                         (language == Language.ENGLISH ? "Closing the application" : "???");
             }
+            case "Игровое поле" -> {
+                return language == Language.RUSSIAN ? "Игровое поле" :
+                        (language == Language.ENGLISH ? "Game field" : "???");
+            }
+            case "Протокол работы" -> {
+                return language == Language.RUSSIAN ? "Протокол работы" :
+                        (language == Language.ENGLISH ? "Work protocol" : "???");
+            }
             default -> {
                 return "???";
             }

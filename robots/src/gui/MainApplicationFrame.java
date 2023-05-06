@@ -31,7 +31,7 @@ public class MainApplicationFrame extends JFrame {
 
         addWindow(createLogWindow(inset, screenSize));
 
-        addWindow(new GameWindow() {
+        addWindow(new GameWindow(adapter) {
             {
                 setSize(400, 400);
             }
@@ -42,7 +42,7 @@ public class MainApplicationFrame extends JFrame {
     }
 
     protected LogWindow createLogWindow(int inset, Dimension screenSize) {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
+        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), adapter);
 
         int width = 300;
         logWindow.setLocation(screenSize.width - width - 10 + inset * 2, 0);
