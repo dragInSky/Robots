@@ -15,6 +15,7 @@ public class GameModelController extends JPanel {
 
     private int count = 0;
 
+    private static final double duration = 10;
     private static final double maxVelocity = 0.25;
     private static final double maxAngularVelocity = 0.0075;
 
@@ -73,7 +74,7 @@ public class GameModelController extends JPanel {
             angularVelocity = -maxAngularVelocity;
         }
 
-        moveRobot(maxVelocity, angularVelocity, 10);
+        moveRobot(angularVelocity);
     }
 
     private static double applyLimits(double value, double min, double max) {
@@ -83,21 +84,20 @@ public class GameModelController extends JPanel {
         return Math.min(value, max);
     }
 
-    private void moveRobot(double velocity, double angularVelocity, double duration) {
-        velocity = applyLimits(velocity, 0, maxVelocity);
+    private void moveRobot(double angularVelocity) {
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
 
         double newX, newY;
         if (angularVelocity != 0) {
-            newX = m_robotPositionX + velocity / angularVelocity *
+            newX = m_robotPositionX + maxVelocity / angularVelocity *
                     (Math.sin(m_robotDirection + angularVelocity * duration) -
                             Math.sin(m_robotDirection));
-            newY = m_robotPositionY - velocity / angularVelocity *
+            newY = m_robotPositionY - maxVelocity / angularVelocity *
                     (Math.cos(m_robotDirection + angularVelocity * duration) -
                             Math.cos(m_robotDirection));
         } else {
-            newX = m_robotPositionX + velocity * duration * Math.cos(m_robotDirection);
-            newY = m_robotPositionY + velocity * duration * Math.sin(m_robotDirection);
+            newX = m_robotPositionX + maxVelocity * duration * Math.cos(m_robotDirection);
+            newY = m_robotPositionY + maxVelocity * duration * Math.sin(m_robotDirection);
         }
 
         double newDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration);
