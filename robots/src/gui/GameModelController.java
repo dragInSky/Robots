@@ -13,6 +13,8 @@ public class GameModelController extends JPanel {
     private volatile int m_targetPositionX = 150;
     private volatile int m_targetPositionY = 100;
 
+    private int count = 0;
+
     private static final double maxVelocity = 0.25;
     private static final double maxAngularVelocity = 0.0075;
 
@@ -56,7 +58,7 @@ public class GameModelController extends JPanel {
     }
 
     protected void onModelUpdateEvent() {
-        if (distance(m_targetPositionX, m_targetPositionY, m_robotPositionX, m_robotPositionY) < 1) {
+        if (distance(m_targetPositionX, m_targetPositionY, m_robotPositionX, m_robotPositionY) < 2) {
             m_robotPositionX = m_targetPositionX;
             m_robotPositionY = m_targetPositionY;
             return;
@@ -115,9 +117,14 @@ public class GameModelController extends JPanel {
         }
 
         if ((int) m_robotPositionX != (int) newX || (int) m_robotPositionY != (int) newY) {
-            support.firePropertyChange("coordinates",
-                    new Point((int) m_robotPositionX, (int) m_robotPositionY), new Point((int) newX, (int) newY)
-            );
+            count++;
+            if (count == 8) {
+                support.firePropertyChange("coordinates",
+                        new Point((int) m_robotPositionX, (int) m_robotPositionY), new Point((int) newX, (int) newY)
+                );
+                count = 0;
+            }
+
         }
 
         m_robotPositionX = newX;
