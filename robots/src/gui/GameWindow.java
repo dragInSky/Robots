@@ -1,6 +1,6 @@
 package gui;
 
-import locale.LocaleAdapter;
+import locale.LanguageAdapter;
 
 import java.awt.BorderLayout;
 
@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 public class GameWindow extends JInternalFrame {
     private final GameVisualizer m_visualizer;
 
-    public GameWindow(LocaleAdapter adapter) {
+    public GameWindow(LanguageAdapter adapter) {
         super(adapter.translate("Игровое поле"), true, true, true, true);
         m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());

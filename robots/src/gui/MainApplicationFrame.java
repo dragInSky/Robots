@@ -6,7 +6,7 @@ import java.awt.event.*;
 
 import javax.swing.*;
 
-import locale.LocaleAdapter;
+import locale.LanguageAdapter;
 import log.Logger;
 
 /**
@@ -16,9 +16,9 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
-    private final LocaleAdapter adapter;
+    private final LanguageAdapter adapter;
 
-    public MainApplicationFrame(LocaleAdapter adapter) {
+    public MainApplicationFrame(LanguageAdapter adapter) {
         this.adapter = adapter;
 
         //Make the big window be indented 50 pixels from each edge
