@@ -73,8 +73,8 @@ public class MainApplicationFrame extends JFrame {
 
     private void loadWindows() {
         for (SerializableInternalFrame window : windows) {
-            if (Boolean.parseBoolean(cfg.getProperty(window.isSerializable()))) {
-                window.load(cfg.getProperty(window.getOutPath()));
+            if (window.isSerializable()) {
+                window.load();
             }
         }
         if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {

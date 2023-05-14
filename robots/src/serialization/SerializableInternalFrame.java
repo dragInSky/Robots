@@ -5,6 +5,9 @@ import java.beans.PropertyVetoException;
 import java.io.File;
 
 abstract public class SerializableInternalFrame extends JInternalFrame {
+
+    String isSerKey;
+    String WindowPath;
     public SerializableInternalFrame() {
         super("Игровое поле", true, true, true, true);
     }
@@ -37,7 +40,9 @@ abstract public class SerializableInternalFrame extends JInternalFrame {
         }
     }
 
-    public abstract String isSerializable();
+    public abstract Boolean isSerializable(){
+
+    };
 
     public abstract String getOutPath();
 }
