@@ -1,6 +1,8 @@
 package gui;
 
 import java.awt.*;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -13,14 +15,27 @@ public class RobotsProgram {
             e.printStackTrace();
         }
 
-        LogWindow logWindow = new LogWindow(Toolkit.getDefaultToolkit().getScreenSize());
-        GameWindow gameWindow = new GameWindow(400, 400);
+        Properties cfg = configSetUp();
+
+        LogWindow logWindow = new LogWindow(Toolkit.getDefaultToolkit().getScreenSize(), cfg);
+        GameWindow gameWindow = new GameWindow(400, 400, cfg);
 
         SwingUtilities.invokeLater(() -> {
-            MainApplicationFrame frame = new MainApplicationFrame(logWindow, gameWindow);
+            MainApplicationFrame frame = new MainApplicationFrame(cfg, logWindow, gameWindow);
             frame.pack();
             frame.setVisible(true);
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
         });
+    }
+
+    private static Properties configSetUp() {
+        Properties cfg = new Properties();
+        String cfgFilePath = "config.properties";
+        try (FileInputStream cfgInput = new FileInputStream(cfgFilePath)) {
+            cfg.load(cfgInput);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return cfg;
     }
 }

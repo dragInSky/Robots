@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FileInputStream;
 import java.util.Properties;
 
 import javax.swing.*;
@@ -19,18 +18,11 @@ import serialization.SerializableInternalFrame;
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final SerializableInternalFrame[] windows;
-    private final ProgramState programState = new ProgramState();
-    private final Properties cfg = new Properties();
+    private final ProgramState programState;
 
-    public MainApplicationFrame(SerializableInternalFrame ... windows/*, Adapter adapter*/) {
+    public MainApplicationFrame(Properties cfg, SerializableInternalFrame ... windows) {
         this.windows = windows;
-
-        String cfgFilePath = "config.properties";
-        try (FileInputStream cfgInput = new FileInputStream(cfgFilePath)) {
-            cfg.load(cfgInput);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        programState = new ProgramState(cfg);
 
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -55,32 +47,19 @@ public class MainApplicationFrame extends JFrame {
         frame.setVisible(true);
     }
 
-    private void updateProgramState() {
-        programState.className = UIManager.getLookAndFeel().getClass().getName();
-    }
-
     private void saveWindows() {
         for (SerializableInternalFrame window : windows) {
-            if (Boolean.parseBoolean(cfg.getProperty(window.isSerializable()))) {
-                window.save(cfg.getProperty(window.getOutPath()));
-            }
+            window.save();
         }
-        if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {
-            updateProgramState();
-            programState.save(cfg.getProperty("programStateOutPath"));
-        }
+        programState.save();
     }
 
     private void loadWindows() {
         for (SerializableInternalFrame window : windows) {
-            if (window.isSerializable()) {
-                window.load();
-            }
+            window.load();
         }
-        if (Boolean.parseBoolean(cfg.getProperty("isProgramStateSerializable"))) {
-            programState.load(cfg.getProperty("programStateOutPath"));
-            setLookAndFeel(programState.className);
-        }
+        programState.load();
+        setLookAndFeel(programState.className);
         this.invalidate();
     }
 

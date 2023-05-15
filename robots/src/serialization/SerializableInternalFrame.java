@@ -3,13 +3,18 @@ package serialization;
 import javax.swing.*;
 import java.beans.PropertyVetoException;
 import java.io.File;
+import java.util.Properties;
 
 abstract public class SerializableInternalFrame extends JInternalFrame {
+    private final String isSerializableKey;
+    private final String outPathKey;
+    private final Properties cfg;
 
-    String isSerKey;
-    String WindowPath;
-    public SerializableInternalFrame() {
+    public SerializableInternalFrame(String isSerializableKey, String outPathKey, Properties cfg) {
         super("Игровое поле", true, true, true, true);
+        this.isSerializableKey = isSerializableKey;
+        this.outPathKey = outPathKey;
+        this.cfg = cfg;
     }
 
     private FrameState getFrameState() {
@@ -28,21 +33,26 @@ abstract public class SerializableInternalFrame extends JInternalFrame {
         }
     }
 
-    public void save(String outPath) {
-        getFrameState().save(outPath);
+    public void save() {
+        if (isSerializable()) {
+            getFrameState().save(getOutPathKey());
+        }
     }
 
-    public void load(String inPath) {
-        if (new File(inPath).isFile()) {
+    public void load() {
+        String outPath = getOutPathKey();
+        if (isSerializable() && new File(outPath).isFile()) {
             FrameState frameState = new FrameState();
-            frameState.load(inPath);
+            frameState.load(outPath);
             setWindowState(frameState);
         }
     }
 
-    public abstract Boolean isSerializable(){
+    private Boolean isSerializable() {
+        return Boolean.parseBoolean(cfg.getProperty(isSerializableKey));
+    }
 
-    };
-
-    public abstract String getOutPath();
+    private String getOutPathKey() {
+        return cfg.getProperty(outPathKey);
+    }
 }

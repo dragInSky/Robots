@@ -1,33 +1,23 @@
 package gui;
 
 import serialization.SerializableInternalFrame;
+
 import java.awt.BorderLayout;
+import java.util.Properties;
 import javax.swing.JPanel;
 
 public class GameWindow extends SerializableInternalFrame {
-    private final GameVisualizer m_visualizer;
-
-    public GameWindow() {
-        super();
-        m_visualizer = new GameVisualizer();
+    public GameWindow(Properties cfg) {
+        super("isGameWindowSerializable", "gameWindowOutPath", cfg);
+        GameVisualizer m_visualizer = new GameVisualizer();
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_visualizer, BorderLayout.CENTER);
         getContentPane().add(panel);
         pack();
     }
 
-    @Override
-    public String isSerializable() {
-        return "isGameWindowSerializable";
-    }
-
-    @Override
-    public String getOutPath() {
-        return "gameWindowOutPath";
-    }
-
-    public GameWindow(int wight, int height) {
-        this();
+    public GameWindow(int wight, int height, Properties cfg) {
+        this(cfg);
         setSize(wight, height);
     }
 }

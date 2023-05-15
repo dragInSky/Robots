@@ -1,7 +1,9 @@
 package gui;
 
 import java.awt.*;
+import java.util.Properties;
 import javax.swing.JPanel;
+
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
@@ -12,8 +14,8 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
 
-    public LogWindow(LogWindowSource logSource) {
-        super();
+    public LogWindow(LogWindowSource logSource, Properties cfg) {
+        super("isLogWindowSerializable", "logWindowOutPath", cfg);
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -26,8 +28,8 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
         updateLogContent();
     }
 
-    public LogWindow(Dimension screenSize) {
-        this(Logger.getDefaultLogSource());
+    public LogWindow(Dimension screenSize, Properties cfg) {
+        this(Logger.getDefaultLogSource(), cfg);
 
         int width = 300;
         this.setLocation(screenSize.width - width, 0);
@@ -51,15 +53,5 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
-    }
-
-    @Override
-    public String isSerializable() {
-        return "isLogWindowSerializable";
-    }
-
-    @Override
-    public String getOutPath() {
-        return "logWindowOutPath";
     }
 }
