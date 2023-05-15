@@ -6,6 +6,9 @@ import java.beans.PropertyChangeSupport;
 import javax.swing.*;
 
 public class GameModelController extends JPanel {
+    // просто Game
+    // просто Position
+    // сделать классы Robot и Target
     private volatile double m_robotPositionX = 100;
     private volatile double m_robotPositionY = 100;
     private volatile double m_robotDirection = 0;
@@ -28,6 +31,7 @@ public class GameModelController extends JPanel {
         support.addPropertyChangeListener(coordinatesWindow);
     }
 
+    // public, Game.Robot.Position.X
     public double getRobotPositionX() {
         return m_robotPositionX;
     }
@@ -50,6 +54,7 @@ public class GameModelController extends JPanel {
         m_targetPositionY = p.y;
     }
 
+    //Выделить геометрию в отдельный класс
     private static double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
     }
@@ -102,6 +107,7 @@ public class GameModelController extends JPanel {
 
         double newDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration);
 
+        // выделить в метод
         int width = gameWindow.getWidth() * 2 - 20;
         if (newX < 0) {
             newX += width;
