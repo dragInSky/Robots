@@ -8,7 +8,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 
 public class CoordinatesWindow extends JInternalFrame implements PropertyChangeListener {
-    private TextArea coordinatesContent;
+    private final TextArea coordinatesContent;
 
     public CoordinatesWindow() {
         super("Координаты робота", true, true, true, true);

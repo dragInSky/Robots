@@ -1,5 +1,7 @@
 package gui;
 
+import game.GameView;
+
 import java.awt.BorderLayout;
 
 import javax.swing.JInternalFrame;

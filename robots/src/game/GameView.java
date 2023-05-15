@@ -1,4 +1,7 @@
-package gui;
+package game;
+
+import gui.CoordinatesWindow;
+import gui.GameWindow;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,10 +16,10 @@ import java.util.TimerTask;
  * @since 07.05.2023
  */
 public class GameView extends JPanel {
-    private final GameModelController gameModelController;
+    private final Game game;
 
     public GameView(GameWindow gameWindow, CoordinatesWindow coordinatesWindow) {
-        this.gameModelController = new GameModelController(gameWindow, coordinatesWindow);
+        this.game = new Game(gameWindow, coordinatesWindow);
 
         java.util.Timer timer = new Timer("events generator", true);
         timer.schedule(new TimerTask() {
@@ -28,7 +31,7 @@ public class GameView extends JPanel {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                gameModelController.onModelUpdateEvent();
+                game.onModelUpdateEvent();
             }
         }, 0, 10);
         addMouseListener(new MouseAdapter() {
@@ -38,7 +41,7 @@ public class GameView extends JPanel {
                 double scale = Toolkit.getDefaultToolkit().getScreenResolution() / 224.0;
                 point.x = (int) (point.x / scale);
                 point.y = (int) (point.y / scale);
-                gameModelController.setTargetPosition(point);
+                game.target.setPosition(point);
                 repaint();
             }
         });
@@ -57,8 +60,8 @@ public class GameView extends JPanel {
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
-        drawRobot(g2d, gameModelController.getRobotDirection());
-        drawTarget(g2d, gameModelController.getTargetPositionX(), gameModelController.getTargetPositionY());
+        drawRobot(g2d, game.robot.direction);
+        drawTarget(g2d, game.target.position.x, game.target.position.y);
     }
 
     private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2) {
@@ -70,8 +73,8 @@ public class GameView extends JPanel {
     }
 
     private void drawRobot(Graphics2D g, double direction) {
-        int robotCenterX = round(gameModelController.getRobotPositionX());
-        int robotCenterY = round(gameModelController.getRobotPositionY());
+        int robotCenterX = round(game.robot.position.x);
+        int robotCenterY = round(game.robot.position.y);
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);
