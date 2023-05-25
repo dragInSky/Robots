@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import javax.swing.*;
 
+import locale.LanguageAdapter;
 import log.Logger;
 import serialization.ProgramState;
 import serialization.SerializableInternalFrame;
@@ -19,8 +20,10 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final SerializableInternalFrame[] windows;
     private final ProgramState programState;
+    private final LanguageAdapter adapter;
 
-    public MainApplicationFrame(Properties cfg, SerializableInternalFrame ... windows) {
+    public MainApplicationFrame(LanguageAdapter adapter, Properties cfg, SerializableInternalFrame ... windows) {
+        this.adapter = adapter;
         this.windows = windows;
         programState = new ProgramState(cfg);
 
@@ -64,12 +67,15 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private void programExit(ActionEvent e) {
-        int confirmed = JOptionPane.showOptionDialog(null,
-                "Вы точно хотите закрыть приложение?",
-                "Подтверджение выхода",
+        int confirmed = JOptionPane.showOptionDialog(
+                null,
+                adapter.translate("Вы точно хотите закрыть приложение?"),
+                adapter.translate("Подтверджение выхода"),
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.INFORMATION_MESSAGE,
-                null, new String[]{"Да", "Нет"}, null
+                null,
+                new String[]{adapter.translate("Да"), adapter.translate("Нет")},
+                null
         );
 
         if (confirmed == JOptionPane.YES_OPTION) {
@@ -87,48 +93,59 @@ public class MainApplicationFrame extends JFrame {
         return jMenu;
     }
 
-    private void generateMenuItems(JMenu jMenu, int externalKeyEvents, String texts, ActionListener actionListener) {
+    //Либо передавать структуру, либо создавать по одной менюшке
+    private JMenuItem generateMenuItems(int externalKeyEvents, String texts, ActionListener actionListener) {
         JMenuItem jMenuItem = new JMenuItem(texts, externalKeyEvents);
         jMenuItem.addActionListener(actionListener);
-        jMenu.add(jMenuItem);
+        return jMenuItem;
     }
 
     private JMenu lookAndFeelMenu() {
-        JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_U,
-                "Режим отображения", "Управление режимом отображения приложения"
+        JMenu lookAndFeelMenu = generateMenu(KeyEvent.VK_V,
+                adapter.translate("Режим отображения"),
+                adapter.translate("Управление режимом отображения приложения")
         );
-        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Облачная схема",
-                event -> setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel")
-        );
-        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Системная схема",
-                event -> setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-        );
-        generateMenuItems(lookAndFeelMenu, KeyEvent.VK_U, "Универсальная схема",
-                event -> setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName())
-        );
+        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_S, adapter.translate("Системная схема"),
+                event -> {
+                    setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    this.invalidate();
+                }
+        ));
+        lookAndFeelMenu.add(generateMenuItems(KeyEvent.VK_U, adapter.translate("Универсальная схема"),
+                event -> {
+                    setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+                    this.invalidate();
+                }
+        ));
         return lookAndFeelMenu;
     }
 
     private JMenu testMenu() {
-        JMenu testMenu = generateMenu(KeyEvent.VK_T, "Тесты", "Тестовые команды");
-        generateMenuItems(testMenu, KeyEvent.VK_T, "Сообщение в лог",
-                event -> Logger.debug("Новая строка")
+        JMenu testMenu = generateMenu(
+                KeyEvent.VK_T, adapter.translate("Тесты"), adapter.translate("Тестовые команды")
         );
+        testMenu.add(generateMenuItems(KeyEvent.VK_T, adapter.translate("Сообщение в лог"),
+                event -> Logger.debug(adapter.translate("Новая строка"))
+        ));
         return testMenu;
     }
 
     private JMenu saveLoadMenu() {
-        JMenu saveLoadMenu = generateMenu(KeyEvent.VK_L,
-                "Сохранение и загрузка", "Сохранение и загрузка состояния приложения"
+        JMenu saveLoadMenu = generateMenu(
+                KeyEvent.VK_L,
+                adapter.translate("Сохранение и загрузка"),
+                adapter.translate("Сохранение и загрузка состояния приложения")
         );
-        generateMenuItems(saveLoadMenu, KeyEvent.VK_S, "Сохранение", event -> saveWindows());
-        generateMenuItems(saveLoadMenu, KeyEvent.VK_L, "Загрузка", event -> loadWindows());
+        saveLoadMenu.add(generateMenuItems(KeyEvent.VK_S, adapter.translate("Сохранение"), event -> saveWindows()));
+        saveLoadMenu.add(generateMenuItems(KeyEvent.VK_L, adapter.translate("Загрузка"), event -> loadWindows()));
         return saveLoadMenu;
     }
 
     private JMenu exitMenu() {
-        JMenu exitMenu = generateMenu(KeyEvent.VK_Z, "Выход", "Закрытие приложения");
-        generateMenuItems(exitMenu, KeyEvent.VK_Z, "Закрытие приложения", this::programExit);
+        JMenu exitMenu = generateMenu(
+                KeyEvent.VK_Z, adapter.translate("Выход"), adapter.translate("Закрытие приложения")
+        );
+        exitMenu.add(generateMenuItems(KeyEvent.VK_Z, adapter.translate("Закрытие приложения"), this::programExit));
         return exitMenu;
     }
 

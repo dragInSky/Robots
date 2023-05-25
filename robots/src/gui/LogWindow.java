@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.Properties;
 import javax.swing.JPanel;
 
+import locale.LanguageAdapter;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
@@ -14,8 +15,8 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
 
-    public LogWindow(LogWindowSource logSource, Properties cfg) {
-        super("isLogWindowSerializable", "logWindowOutPath", cfg);
+    public LogWindow(LanguageAdapter adapter, LogWindowSource logSource, Properties cfg) {
+        super(adapter, "isLogWindowSerializable", "logWindowOutPath", cfg);
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");
@@ -28,8 +29,8 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
         updateLogContent();
     }
 
-    public LogWindow(Dimension screenSize, Properties cfg) {
-        this(Logger.getDefaultLogSource(), cfg);
+    public LogWindow(LanguageAdapter adapter, Dimension screenSize, Properties cfg) {
+        this(adapter, Logger.getDefaultLogSource(), cfg);
 
         int width = 300;
         this.setLocation(screenSize.width - width, 0);
@@ -37,8 +38,7 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
         this.setSize(width, screenSize.height);
         setMinimumSize(this.getSize());
         this.pack();
-        //Logger.debug(adapter.Translate("Протокол работает");
-        Logger.debug("Протокол работает");
+        Logger.debug(adapter.translate("Протокол работает"));
     }
 
     private void updateLogContent() {

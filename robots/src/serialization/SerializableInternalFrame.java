@@ -1,5 +1,7 @@
 package serialization;
 
+import locale.LanguageAdapter;
+
 import javax.swing.*;
 import java.beans.PropertyVetoException;
 import java.io.File;
@@ -10,8 +12,8 @@ abstract public class SerializableInternalFrame extends JInternalFrame {
     private final String outPathKey;
     private final Properties cfg;
 
-    public SerializableInternalFrame(String isSerializableKey, String outPathKey, Properties cfg) {
-        super("Игровое поле", true, true, true, true);
+    public SerializableInternalFrame(LanguageAdapter adapter, String isSerializableKey, String outPathKey, Properties cfg) {
+        super(adapter.translate("Игровое поле"), true, true, true, true);
         this.isSerializableKey = isSerializableKey;
         this.outPathKey = outPathKey;
         this.cfg = cfg;

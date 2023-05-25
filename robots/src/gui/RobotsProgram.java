@@ -1,8 +1,12 @@
 package gui;
 
+import locale.EnglishAdapter;
+
 import java.awt.*;
 import java.io.FileInputStream;
 import java.util.Properties;
+
+import java.awt.Frame;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -17,11 +21,11 @@ public class RobotsProgram {
 
         Properties cfg = configSetUp();
 
-        LogWindow logWindow = new LogWindow(Toolkit.getDefaultToolkit().getScreenSize(), cfg);
-        GameWindow gameWindow = new GameWindow(400, 400, cfg);
+        LogWindow logWindow = new LogWindow(new EnglishAdapter(), Toolkit.getDefaultToolkit().getScreenSize(), cfg);
+        GameWindow gameWindow = new GameWindow(new EnglishAdapter(), 400, 400, cfg);
 
         SwingUtilities.invokeLater(() -> {
-            MainApplicationFrame frame = new MainApplicationFrame(cfg, logWindow, gameWindow);
+            MainApplicationFrame frame = new MainApplicationFrame(new EnglishAdapter(), cfg, logWindow, gameWindow);
             frame.pack();
             frame.setVisible(true);
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);
