@@ -24,6 +24,10 @@ public class EnglishAdapter implements LanguageAdapter {
             case "Закрытие приложения" -> "Closing the application";
             case "Игровое поле" -> "Game field";
             case "Протокол работы" -> "Work protocol";
+            case "Сохранение и загрузка" -> "Save and load";
+            case "Сохранение и загрузка состояния приложения" -> "Saving and loading the application state";
+            case "Сохранение" -> "Save";
+            case "Загрузка" -> "Load";
             default -> "???";
         };
     }

@@ -1,13 +1,15 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.*;
+import java.util.Properties;
 
 import javax.swing.*;
 
 import locale.LanguageAdapter;
 import log.Logger;
+import serialization.ProgramState;
+import serialization.SerializableInternalFrame;
 
 /**
  * Что требуется сделать:
@@ -16,10 +18,14 @@ import log.Logger;
  */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final SerializableInternalFrame[] windows;
+    private final ProgramState programState;
     private final LanguageAdapter adapter;
 
-    public MainApplicationFrame(LanguageAdapter adapter) {
+    public MainApplicationFrame(LanguageAdapter adapter, Properties cfg, SerializableInternalFrame ... windows) {
         this.adapter = adapter;
+        this.windows = windows;
+        programState = new ProgramState(cfg);
 
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -29,34 +35,35 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-        addWindow(createLogWindow(inset, screenSize));
+        for (SerializableInternalFrame window : windows) {
+            addWindow(window);
+        }
 
-        addWindow(new GameWindow(adapter) {
-            {
-                setSize(400, 400);
-            }
-        });
+        loadWindows();
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    protected LogWindow createLogWindow(int inset, Dimension screenSize) {
-        LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource(), adapter);
-
-        int width = 300;
-        logWindow.setLocation(screenSize.width - width - 10 + inset * 2, 0);
-
-        logWindow.setSize(width, screenSize.height);
-        setMinimumSize(logWindow.getSize());
-        logWindow.pack();
-        Logger.debug(adapter.translate("Протокол работает"));
-        return logWindow;
-    }
-
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
+    }
+
+    private void saveWindows() {
+        for (SerializableInternalFrame window : windows) {
+            window.save();
+        }
+        programState.save();
+    }
+
+    private void loadWindows() {
+        for (SerializableInternalFrame window : windows) {
+            window.load();
+        }
+        programState.load();
+        setLookAndFeel(programState.className);
+        this.invalidate();
     }
 
     private void programExit(ActionEvent e) {
@@ -72,6 +79,7 @@ public class MainApplicationFrame extends JFrame {
         );
 
         if (confirmed == JOptionPane.YES_OPTION) {
+            saveWindows();
             dispose();
             System.exit(0);
         }
@@ -122,6 +130,17 @@ public class MainApplicationFrame extends JFrame {
         return testMenu;
     }
 
+    private JMenu saveLoadMenu() {
+        JMenu saveLoadMenu = generateMenu(
+                KeyEvent.VK_L,
+                adapter.translate("Сохранение и загрузка"),
+                adapter.translate("Сохранение и загрузка состояния приложения")
+        );
+        saveLoadMenu.add(generateMenuItems(KeyEvent.VK_S, adapter.translate("Сохранение"), event -> saveWindows()));
+        saveLoadMenu.add(generateMenuItems(KeyEvent.VK_L, adapter.translate("Загрузка"), event -> loadWindows()));
+        return saveLoadMenu;
+    }
+
     private JMenu exitMenu() {
         JMenu exitMenu = generateMenu(
                 KeyEvent.VK_Z, adapter.translate("Выход"), adapter.translate("Закрытие приложения")
@@ -135,6 +154,7 @@ public class MainApplicationFrame extends JFrame {
 
         menuBar.add(lookAndFeelMenu());
         menuBar.add(testMenu());
+        menuBar.add(saveLoadMenu());
         menuBar.add(exitMenu());
 
         return menuBar;
@@ -148,5 +168,6 @@ public class MainApplicationFrame extends JFrame {
                  | IllegalAccessException | UnsupportedLookAndFeelException e) {
             // just ignore
         }
+        this.invalidate();
     }
 }
