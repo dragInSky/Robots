@@ -25,22 +25,18 @@ public class Game extends JPanel {
     }
 
     protected void onModelUpdateEvent() {
-        if (Geometry.distance(
-                target.position.x, target.position.y, robot.position.x, robot.position.y
-        ) < 2) {
+        if (Geometry.distance(target.position, robot.position) < 2) {
             robot.position.setPosition(target.position);
             return;
         }
 
-        double angleToTarget = Geometry.angleTo(
-                robot.position.x, robot.position.y, target.position.x, target.position.y
-        );
+        double angleToTarget = Geometry.angleTo(robot.position, target.position);
 
         double angularVelocity = 0;
         if (angleToTarget > robot.direction + 0.01) {
-            angularVelocity = Robot.MAX_ANGULAR_VELOCITY;
+            angularVelocity = robot.maxAngularVelocity;
         } else if (angleToTarget < robot.direction - 0.01) {
-            angularVelocity = -Robot.MAX_ANGULAR_VELOCITY;
+            angularVelocity = -robot.maxAngularVelocity;
         }
 
         moveRobot(angularVelocity);
@@ -48,61 +44,62 @@ public class Game extends JPanel {
 
     private void moveRobot(double angularVelocity) {
         angularVelocity = Geometry.applyLimits(
-                angularVelocity, -Robot.MAX_ANGULAR_VELOCITY, Robot.MAX_ANGULAR_VELOCITY
+                angularVelocity, -robot.maxAngularVelocity, robot.maxAngularVelocity
         );
 
-        double newX, newY;
+        Position newCoordinate = new Position(0, 0);
         if (angularVelocity != 0) {
-            newX = robot.position.x + Robot.MAX_VELOCITY / angularVelocity *
-                    (Math.sin(robot.direction + angularVelocity * Robot.DURATION) -
-                            Math.sin(robot.direction));
-            newY = robot.position.y - Robot.MAX_VELOCITY / angularVelocity *
-                    (Math.cos(robot.direction + angularVelocity * Robot.DURATION) -
-                            Math.cos(robot.direction));
+            newCoordinate.setPosition(
+                    robot.position.x + robot.maxVelocity / angularVelocity *
+                            (Math.sin(robot.direction + angularVelocity * robot.duration) -
+                                    Math.sin(robot.direction)),
+                    robot.position.y - robot.maxVelocity / angularVelocity *
+                            (Math.cos(robot.direction + angularVelocity * robot.duration) -
+                                    Math.cos(robot.direction))
+            );
         } else {
-            newX = robot.position.x + Robot.MAX_VELOCITY * Robot.DURATION * Math.cos(robot.direction);
-            newY = robot.position.y + Robot.MAX_VELOCITY * Robot.DURATION * Math.sin(robot.direction);
+            newCoordinate.setPosition(
+                    robot.position.x + robot.maxVelocity * robot.duration * Math.cos(robot.direction),
+                    robot.position.y + robot.maxVelocity * robot.duration * Math.sin(robot.direction)
+            );
         }
 
-        double newDirection = Geometry.asNormalizedRadians(robot.direction + angularVelocity * Robot.DURATION);
+        double newDirection = Geometry.asNormalizedRadians(robot.direction + angularVelocity * robot.duration);
 
-        updateCoordinatesChange(newX, newY);
+        updateCoordinatesChange(newCoordinate);
 
-        Position topologyPosition = topology(newX, newY);
-        newX = topologyPosition.x;
-        newY = topologyPosition.y;
+        topology(newCoordinate);
 
-        robot.position.setPosition(newX, newY);
+        robot.position.setPosition(newCoordinate);
         robot.direction = newDirection;
     }
 
-    private void updateCoordinatesChange(double newX, double newY) {
-        if ((int) robot.position.x != (int) newX || (int) robot.position.y != (int) newY) {
+    private void updateCoordinatesChange(Position coordinate) {
+        if ((int) robot.position.x != (int) coordinate.x || (int) robot.position.y != (int) coordinate.y) {
             count++;
             if (count == 8) {
                 support.firePropertyChange("coordinates",
-                        new Point((int) robot.position.x, (int) robot.position.y), new Point((int) newX, (int) newY)
+                        new Point((int) robot.position.x, (int) robot.position.y),
+                        new Point((int) coordinate.x, (int) coordinate.y)
                 );
                 count = 0;
             }
         }
     }
 
-    private Position topology(double newX, double newY) {
+    private void topology(Position coordinate) {
         int width = gameWindow.getWidth() * 2 - 20;
-        if (newX < 0) {
-            newX += width;
-        } else if (newX > width) {
-            newX -= width;
+        if (coordinate.x < 0) {
+            coordinate.x += width;
+        } else if (coordinate.x > width) {
+            coordinate.x -= width;
         }
 
         int height = gameWindow.getHeight() * 2 - 40;
-        if (newY < 0) {
-            newY += height;
-        } else if (newY > height) {
-            newY -= height;
+        if (coordinate.y < 0) {
+            coordinate.y += height;
+        } else if (coordinate.y > height) {
+            coordinate.y -= height;
         }
-
-        return new Position(newX, newY);
     }
 }

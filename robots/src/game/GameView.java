@@ -2,6 +2,7 @@ package game;
 
 import gui.CoordinatesWindow;
 import gui.GameWindow;
+import util.Position;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,9 +40,11 @@ public class GameView extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 Point point = e.getPoint();
                 double scale = Toolkit.getDefaultToolkit().getScreenResolution() / 224.0;
-                point.x = (int) (point.x / scale);
-                point.y = (int) (point.y / scale);
-                game.target.setPosition(point);
+                point.setLocation(
+                        (int) (point.x / scale),
+                        (int) (point.y / scale)
+                );
+                game.target.position.setPosition(point);
                 repaint();
             }
         });
@@ -61,7 +64,7 @@ public class GameView extends JPanel {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
         drawRobot(g2d, game.robot.direction);
-        drawTarget(g2d, game.target.position.x, game.target.position.y);
+        drawTarget(g2d, game.target.position);
     }
 
     private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2) {
@@ -73,26 +76,28 @@ public class GameView extends JPanel {
     }
 
     private void drawRobot(Graphics2D g, double direction) {
-        int robotCenterX = round(game.robot.position.x);
-        int robotCenterY = round(game.robot.position.y);
-        AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
+        Position position = new Position(
+                round(game.robot.position.x),
+                round(game.robot.position.y)
+        );
+        AffineTransform t = AffineTransform.getRotateInstance(direction, position.x, position.y);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);
-        fillOval(g, robotCenterX, robotCenterY, 30, 10);
+        fillOval(g, (int) position.x, (int) position.y, 30, 10);
         g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX, robotCenterY, 30, 10);
+        drawOval(g, (int) position.x, (int) position.y, 30, 10);
         g.setColor(Color.WHITE);
-        fillOval(g, robotCenterX + 10, robotCenterY, 5, 5);
+        fillOval(g, (int) position.x + 10, (int) position.y, 5, 5);
         g.setColor(Color.BLACK);
-        drawOval(g, robotCenterX + 10, robotCenterY, 5, 5);
+        drawOval(g, (int) position.x + 10, (int) position.y, 5, 5);
     }
 
-    private void drawTarget(Graphics2D g, int x, int y) {
+    private void drawTarget(Graphics2D g, Position position) {
         AffineTransform t = AffineTransform.getRotateInstance(0, 0, 0);
         g.setTransform(t);
         g.setColor(Color.GREEN);
-        fillOval(g, x, y, 5, 5);
+        fillOval(g, (int) position.x, (int) position.y, 5, 5);
         g.setColor(Color.BLACK);
-        drawOval(g, x, y, 5, 5);
+        drawOval(g, (int) position.x, (int) position.y, 5, 5);
     }
 }
