@@ -1,6 +1,7 @@
 package gui;
 
 import locale.EnglishAdapter;
+import locale.LanguageAdapter;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -21,11 +22,16 @@ public class RobotsProgram {
 
         Properties cfg = configSetUp();
 
-        LogWindow logWindow = new LogWindow(new EnglishAdapter(), Toolkit.getDefaultToolkit().getScreenSize(), cfg);
-        GameWindow gameWindow = new GameWindow(new EnglishAdapter(), 400, 400, cfg);
+        LanguageAdapter adapter = new EnglishAdapter();
+
+        CoordinatesWindow coordinatesWindow = new CoordinatesWindow(adapter, cfg);
+        LogWindow logWindow = new LogWindow(adapter, Toolkit.getDefaultToolkit().getScreenSize(), cfg);
+        GameWindow gameWindow = new GameWindow(adapter, coordinatesWindow, 400, 400, cfg);
 
         SwingUtilities.invokeLater(() -> {
-            MainApplicationFrame frame = new MainApplicationFrame(new EnglishAdapter(), cfg, logWindow, gameWindow);
+            MainApplicationFrame frame = new MainApplicationFrame(
+                    adapter, cfg, logWindow, gameWindow, coordinatesWindow
+            );
             frame.pack();
             frame.setVisible(true);
             frame.setExtendedState(Frame.MAXIMIZED_BOTH);

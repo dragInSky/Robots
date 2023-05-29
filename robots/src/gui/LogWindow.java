@@ -16,7 +16,9 @@ public class LogWindow extends SerializableInternalFrame implements LogChangeLis
     private final TextArea m_logContent;
 
     public LogWindow(LanguageAdapter adapter, LogWindowSource logSource, Properties cfg) {
-        super(adapter, "isLogWindowSerializable", "logWindowOutPath", cfg);
+        super(adapter.translate("Протокол работы"),
+                "isLogWindowSerializable", "logWindowOutPath", cfg
+        );
         m_logSource = logSource;
         m_logSource.registerListener(this);
         m_logContent = new TextArea("");

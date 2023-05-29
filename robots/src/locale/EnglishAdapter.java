@@ -28,6 +28,7 @@ public class EnglishAdapter implements LanguageAdapter {
             case "Сохранение и загрузка состояния приложения" -> "Saving and loading the application state";
             case "Сохранение" -> "Save";
             case "Загрузка" -> "Load";
+            case "Координаты робота" -> "Coordinates of the robot";
             default -> "???";
         };
     }
